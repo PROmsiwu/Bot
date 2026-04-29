@@ -4,637 +4,825 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LA7ZA AI</title>
+
+<!-- Marked.js for Markdown -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<!-- Highlight.js for code -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
 
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --border: #1e1e2e;
-    --accent: #00ff88;
-    --accent2: #00ccff;
-    --text: #e0e0f0;
-    --muted: #555570;
-    --danger: #ff4466;
-    --user-bubble: #1a2a1a;
-    --ai-bubble: #12121f;
-  }
+:root {
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --surface2: #14141f;
+  --border: #1c1c2e;
+  --accent: #00ff88;
+  --accent2: #00ccff;
+  --accent3: #7c3aed;
+  --text: #dde1f0;
+  --muted: #4a4a6a;
+  --user-bg: #0d1a0d;
+  --ai-bg: #0d0d1a;
+  --danger: #ff4466;
+  --warn: #ffaa00;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-      radial-gradient(ellipse at 20% 20%, rgba(0,255,136,0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(0,204,255,0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
+/* Grid background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,136,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
 
-  header {
-    position: relative;
-    z-index: 10;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(18,18,26,0.95);
-    backdrop-filter: blur(20px);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(0,255,136,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 90%, rgba(0,204,255,0.05) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
 
-  .logo {
-    width: 42px; height: 42px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 14px; color: #000;
-    letter-spacing: 1px;
-    box-shadow: 0 0 20px rgba(0,255,136,0.3);
-  }
+/* ─── HEADER ─── */
+header {
+  position: relative; z-index: 20;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,16,0.92);
+  backdrop-filter: blur(24px);
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0;
+}
 
-  .header-info h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
-  .header-info p { font-size: 12px; color: var(--muted); }
+.logo {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 11px; color: #000; letter-spacing: 0.5px;
+  box-shadow: 0 0 24px rgba(0,255,136,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
 
-  .status-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-    animation: pulse 2s infinite;
-    margin-right: auto;
-    margin-left: 0;
-  }
+.header-text { flex: 1; }
+.header-text h1 { font-size: 16px; font-weight: 800; color: var(--accent); line-height: 1.2; }
+.header-text p { font-size: 11px; color: var(--muted); }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
+.status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--muted);
+}
 
-  #chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    position: relative;
-    z-index: 1;
-  }
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: blink 2.5s ease-in-out infinite;
+}
 
-  #chat::-webkit-scrollbar { width: 4px; }
-  #chat::-webkit-scrollbar-track { background: transparent; }
-  #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:0.3; }
+}
 
-  .message {
-    display: flex;
-    gap: 10px;
-    max-width: 85%;
-    animation: fadeUp 0.3s ease;
-  }
+.header-btns { display: flex; gap: 8px; }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+.hbtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer; padding: 6px 12px;
+  font-size: 12px; font-family: 'Cairo', sans-serif;
+  transition: all 0.2s; white-space: nowrap;
+}
+.hbtn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.05); }
+.hbtn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,68,102,0.05); }
 
-  .message.user { margin-right: auto; flex-direction: row-reverse; }
-  .message.ai { margin-left: auto; }
+/* ─── CHAT ─── */
+#chat {
+  flex: 1; overflow-y: auto;
+  padding: 24px 16px;
+  display: flex; flex-direction: column; gap: 20px;
+  position: relative; z-index: 1;
+  scroll-behavior: smooth;
+}
 
-  .avatar {
-    width: 32px; height: 32px; border-radius: 10px;
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700;
-  }
+#chat::-webkit-scrollbar { width: 3px; }
+#chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-  .message.user .avatar {
-    background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
-    border: 1px solid var(--border);
-    color: var(--text);
-  }
+/* ─── WELCOME ─── */
+.welcome {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 30px 16px; gap: 16px;
+  animation: fadeUp 0.5s ease;
+}
 
-  .message.ai .avatar {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #000;
-  }
+.welcome-logo {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 0 40px rgba(0,255,136,0.3);
+}
 
-  .bubble {
-    padding: 12px 16px;
-    border-radius: 14px;
-    line-height: 1.7;
-    font-size: 14px;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+.welcome h2 {
+  font-size: 26px; font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
 
-  .message.user .bubble {
-    background: var(--user-bubble);
-    border: 1px solid rgba(0,255,136,0.15);
-    border-radius: 14px 4px 14px 14px;
-  }
+.welcome p { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 360px; }
 
-  .message.ai .bubble {
-    background: var(--ai-bubble);
-    border: 1px solid var(--border);
-    border-radius: 4px 14px 14px 14px;
-  }
+.chips {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  max-width: 500px;
+}
 
-  /* Typing indicator */
-  .typing .bubble {
-    padding: 14px 18px;
-  }
+.chip {
+  padding: 8px 14px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12px; color: var(--text);
+  cursor: pointer; font-family: 'Cairo', sans-serif;
+  transition: all 0.2s; white-space: nowrap;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,255,136,0.06); transform: translateY(-1px); }
 
-  .typing-dots {
-    display: flex; gap: 5px; align-items: center;
-  }
+/* ─── MESSAGES ─── */
+.msg {
+  display: flex; gap: 10px; max-width: 820px; width: 100%;
+  animation: fadeUp 0.25s ease;
+}
 
-  .typing-dots span {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    animation: bounce 1.2s infinite;
-  }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
-  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+.msg.user { margin-right: auto; flex-direction: row-reverse; }
+.msg.ai   { margin-left: auto; }
 
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
+.avatar {
+  width: 34px; height: 34px; border-radius: 10px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; margin-top: 2px;
+}
 
-  /* Input area */
-  .input-area {
-    position: relative;
-    z-index: 10;
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-    background: rgba(18,18,26,0.95);
-    backdrop-filter: blur(20px);
-  }
+.msg.user .avatar { background: var(--surface2); border: 1px solid var(--border); }
+.msg.ai   .avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
 
-  .input-wrapper {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 10px 14px;
-    transition: border-color 0.2s;
-  }
+.bubble {
+  padding: 14px 18px; border-radius: 16px;
+  font-size: 14px; line-height: 1.8;
+  max-width: calc(100% - 50px);
+  word-break: break-word;
+}
 
-  .input-wrapper:focus-within {
-    border-color: rgba(0,255,136,0.4);
-    box-shadow: 0 0 0 3px rgba(0,255,136,0.05);
-  }
+.msg.user .bubble {
+  background: var(--user-bg);
+  border: 1px solid rgba(0,255,136,0.12);
+  border-radius: 16px 4px 16px 16px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
 
-  textarea {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    resize: none;
-    max-height: 120px;
-    line-height: 1.6;
-    direction: rtl;
-  }
+.msg.ai .bubble {
+  background: var(--ai-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px 16px 16px 16px;
+}
 
-  textarea::placeholder { color: var(--muted); }
+/* ─── MARKDOWN in AI bubbles ─── */
+.bubble h1,.bubble h2,.bubble h3 {
+  color: var(--accent); margin: 12px 0 8px; font-weight: 700;
+  border-bottom: 1px solid var(--border); padding-bottom: 6px;
+}
+.bubble h1 { font-size: 18px; }
+.bubble h2 { font-size: 16px; }
+.bubble h3 { font-size: 14px; }
 
-  .send-btn {
-    width: 38px; height: 38px;
-    border-radius: 10px;
-    border: none;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #000;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: transform 0.15s, opacity 0.15s;
-    font-size: 16px;
-  }
+.bubble p { margin: 6px 0; }
+.bubble ul,.bubble ol { margin: 8px 0 8px 20px; }
+.bubble li { margin: 4px 0; }
 
-  .send-btn:hover { transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.95); }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.bubble strong { color: var(--accent2); font-weight: 700; }
+.bubble em { color: #aac; font-style: italic; }
 
-  .footer-note {
-    text-align: center;
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 8px;
-  }
+.bubble a { color: var(--accent); text-decoration: underline; }
 
-  /* Welcome */
-  .welcome {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--muted);
-  }
+.bubble blockquote {
+  border-right: 3px solid var(--accent);
+  padding: 8px 14px; margin: 10px 0;
+  background: rgba(0,255,136,0.04); border-radius: 0 8px 8px 0;
+  color: var(--muted);
+}
 
-  .welcome h2 {
-    font-size: 28px;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-  }
+.bubble table {
+  width: 100%; border-collapse: collapse; margin: 10px 0;
+  font-size: 13px;
+}
+.bubble th { background: rgba(0,255,136,0.1); color: var(--accent); padding: 8px 12px; border: 1px solid var(--border); }
+.bubble td { padding: 7px 12px; border: 1px solid var(--border); }
+.bubble tr:hover td { background: rgba(255,255,255,0.02); }
 
-  .welcome p { font-size: 14px; line-height: 1.8; }
+/* ─── CODE ─── */
+.bubble code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--accent);
+  background: rgba(0,255,136,0.08);
+  padding: 2px 6px; border-radius: 4px;
+}
 
-  .chips {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    justify-content: center; margin-top: 20px;
-  }
+.code-block {
+  margin: 12px 0; border-radius: 10px;
+  border: 1px solid var(--border); overflow: hidden;
+  background: #0d0d15;
+}
 
-  .chip {
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    font-size: 12px;
-    color: var(--text);
-    cursor: pointer;
-    font-family: 'Cairo', sans-serif;
-    transition: border-color 0.2s, background 0.2s;
-  }
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border);
+}
 
-  .chip:hover {
-    border-color: var(--accent);
-    background: rgba(0,255,136,0.05);
-  }
+.code-lang {
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  color: var(--accent2); text-transform: uppercase; letter-spacing: 1px;
+}
 
-  /* Code blocks */
-  .bubble code {
-    background: rgba(0,255,136,0.08);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 13px;
-    color: var(--accent);
-  }
+.copy-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--muted); cursor: pointer;
+  padding: 3px 10px; font-size: 11px; font-family: 'Cairo', sans-serif;
+  transition: all 0.2s;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--accent); color: var(--accent); }
 
-  .bubble pre {
-    background: rgba(0,0,0,0.4);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    margin: 8px 0;
-    overflow-x: auto;
-    font-family: monospace;
-    font-size: 12px;
-    line-height: 1.6;
-  }
+.bubble pre {
+  margin: 0; padding: 16px;
+  overflow-x: auto; direction: ltr; text-align: left;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6;
+  background: transparent !important;
+}
 
-  /* API key warning */
-  .api-warning {
-    background: rgba(255,68,102,0.1);
-    border: 1px solid rgba(255,68,102,0.3);
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 13px;
-    color: #ff8899;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
+.bubble pre::-webkit-scrollbar { height: 3px; }
+.bubble pre::-webkit-scrollbar-thumb { background: var(--border); }
 
-  /* Config panel */
-  .config-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-family: 'Cairo', sans-serif;
-    transition: all 0.2s;
-  }
+/* ─── TYPING ─── */
+.typing-dots { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+.typing-dots span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); opacity: 0.4;
+  animation: tdot 1.3s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes tdot {
+  0%,80%,100% { transform:scale(0.6); opacity:0.3; }
+  40% { transform:scale(1); opacity:1; }
+}
 
-  .config-btn:hover { border-color: var(--accent); color: var(--accent); }
+/* ─── INPUT ─── */
+.input-wrap {
+  position: relative; z-index: 20;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(8,8,16,0.95);
+  backdrop-filter: blur(24px);
+  flex-shrink: 0;
+}
 
-  .config-panel {
-    position: fixed;
-    top: 0; right: 0; bottom: 0;
-    width: 300px;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    padding: 24px;
-    z-index: 100;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+.input-box {
+  display: flex; gap: 10px; align-items: flex-end;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 10px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-box:focus-within {
+  border-color: rgba(0,255,136,0.35);
+  box-shadow: 0 0 0 3px rgba(0,255,136,0.06);
+}
 
-  .config-panel.open { transform: translateX(0); }
+textarea#inp {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--text); font-family: 'Cairo', sans-serif;
+  font-size: 14px; resize: none; max-height: 140px; line-height: 1.6;
+  direction: rtl;
+}
+textarea#inp::placeholder { color: var(--muted); }
 
-  .config-panel h3 { font-size: 16px; font-weight: 700; color: var(--accent); }
+.send-btn {
+  width: 40px; height: 40px; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #000; cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: transform 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 12px rgba(0,255,136,0.3);
+}
+.send-btn:hover:not(:disabled) { transform: scale(1.08); }
+.send-btn:active:not(:disabled) { transform: scale(0.94); }
+.send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-  .config-panel label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px; }
+.input-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; padding: 0 4px;
+}
+.input-hint { font-size: 11px; color: var(--muted); }
+.model-tag {
+  font-size: 11px; color: var(--accent2);
+  background: rgba(0,204,255,0.08);
+  padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(0,204,255,0.15);
+  cursor: pointer; transition: all 0.2s;
+}
+.model-tag:hover { background: rgba(0,204,255,0.15); }
 
-  .config-panel input, .config-panel textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px;
-    direction: ltr;
-  }
+/* ─── MODAL ─── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
 
-  .config-panel textarea { resize: vertical; min-height: 100px; direction: rtl; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px; width: 100%; max-width: 440px;
+  display: flex; flex-direction: column; gap: 18px;
+  transform: translateY(20px); transition: transform 0.25s;
+  max-height: 90vh; overflow-y: auto;
+}
+.overlay.open .modal { transform: translateY(0); }
 
-  .save-btn {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
-    color: #000;
-    font-family: 'Cairo', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    width: 100%;
-  }
+.modal h2 { font-size: 18px; font-weight: 800; color: var(--accent); }
 
-  .close-config {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px;
-    padding: 8px;
-    cursor: pointer;
-    width: 100%;
-  }
+.field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px; color: var(--text);
+  font-family: 'Cairo', sans-serif; font-size: 13px;
+  outline: none; transition: border-color 0.2s;
+  direction: ltr;
+}
+.field textarea { direction: rtl; resize: vertical; min-height: 110px; line-height: 1.6; }
+.field input:focus,.field select:focus,.field textarea:focus { border-color: rgba(0,255,136,0.4); }
+.field select option { background: var(--surface); }
+
+.modal-btns { display: flex; gap: 10px; }
+
+.btn-save {
+  flex: 1; background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: 12px; padding: 12px;
+  color: #000; font-family: 'Cairo', sans-serif; font-weight: 800;
+  font-size: 14px; cursor: pointer; transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.9; }
+
+.btn-cancel {
+  flex: 1; background: none; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+  color: var(--muted); font-family: 'Cairo', sans-serif;
+  font-size: 14px; cursor: pointer; transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+
+.warn-box {
+  background: rgba(255,170,0,0.08); border: 1px solid rgba(255,170,0,0.25);
+  border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #ffcc55;
+  line-height: 1.6;
+}
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 20px; font-size: 13px;
+  z-index: 300; opacity: 0; transition: all 0.3s; pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
+<!-- ─── HEADER ─── -->
 <header>
   <div class="logo">L7Z</div>
-  <div class="header-info">
+  <div class="header-text">
     <h1>LA7ZA AI</h1>
-    <p>مساعدك الشخصي في الأمن السيبراني</p>
+    <p id="modelLabel">gemini-1.5-flash • Cybersecurity Assistant</p>
   </div>
-  <div class="status-dot"></div>
-  <button class="config-btn" onclick="toggleConfig()">⚙️ إعدادات</button>
+  <div class="status"><div class="dot"></div><span>Online</span></div>
+  <div class="header-btns">
+    <button class="hbtn" onclick="openSettings()">⚙️ إعدادات</button>
+    <button class="hbtn danger" onclick="clearChat()">🗑️ مسح</button>
+  </div>
 </header>
 
-<!-- Config panel -->
-<div class="config-panel" id="configPanel">
-  <h3>⚙️ الإعدادات</h3>
-  <div>
-    <label>🔑 Gemini API Key</label>
-    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
-  </div>
-  <div>
-    <label>🤖 الموديل</label>
-    <select id="modelInput" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;">
-      <option value="gemini-1.5-flash">gemini-1.5-flash ✅ (موصى به)</option>
-      <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite</option>
-      <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-      <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-    </select>
-  </div>
-  <div>
-    <label>🧠 System Prompt (شخصية الـ AI)</label>
-    <textarea id="systemPromptInput"></textarea>
-  </div>
-  <button class="save-btn" onclick="saveConfig()">💾 حفظ</button>
-  <button class="close-config" onclick="toggleConfig()">إغلاق</button>
-</div>
-
+<!-- ─── CHAT ─── -->
 <div id="chat">
   <div class="welcome" id="welcome">
-    <h2>LA7ZA AI 🔐</h2>
-    <p>مساعد متخصص في الأمن السيبراني واكتشاف الثغرات<br>جاهز يساعدك في رحلة الـ Bug Bounty</p>
+    <div class="welcome-logo">🔐</div>
+    <h2>LA7ZA AI</h2>
+    <p>مساعد ذكاء اصطناعي متخصص في الأمن السيبراني واكتشاف الثغرات — جاهز يساعدك في Bug Bounty وHackerOne</p>
     <div class="chips">
-      <button class="chip" onclick="sendQuick('اشرح لي XSS وكيف أكتشفه')">XSS vulnerabilities</button>
-      <button class="chip" onclick="sendQuick('اعمل payload لـ SQL injection اساسي')">SQL Injection</button>
-      <button class="chip" onclick="sendQuick('ما هي أفضل أدوات recon لـ Bug Bounty؟')">Recon Tools</button>
-      <button class="chip" onclick="sendQuick('اشرح SSRF وطريقة استغلاله')">SSRF</button>
-      <button class="chip" onclick="sendQuick('كيف أكتب تقرير ثغرة محترف لـ HackerOne؟')">HackerOne Report</button>
-      <button class="chip" onclick="sendQuick('ما هو الفرق بين IDOR وBroken Access Control؟')">IDOR vs BAC</button>
+      <button class="chip" onclick="quick('اشرح XSS وامتالي payload فعال')">⚡ XSS Payloads</button>
+      <button class="chip" onclick="quick('اعمل لي SQL injection cheat sheet كامل')">💉 SQL Injection</button>
+      <button class="chip" onclick="quick('ما هي أفضل أدوات Recon في Bug Bounty؟')">🔍 Recon Tools</button>
+      <button class="chip" onclick="quick('اشرح SSRF وكيف أستغله')">🌐 SSRF</button>
+      <button class="chip" onclick="quick('كيف أكتب تقرير Bug Bounty احترافي لـ HackerOne؟')">📝 HackerOne Report</button>
+      <button class="chip" onclick="quick('اشرح IDOR وامتالي على مثال عملي')">🔓 IDOR</button>
+      <button class="chip" onclick="quick('اعمل python script بسيط لـ directory fuzzing')">🐍 Python Tools</button>
+      <button class="chip" onclick="quick('ما هي أشهر CVEs في 2024؟')">🛡️ CVEs</button>
     </div>
   </div>
 </div>
 
-<div class="input-area">
-  <div class="input-wrapper">
-    <textarea 
-      id="input" 
-      placeholder="اسألني أي حاجة في الأمن السيبراني..."
-      rows="1"
-      onkeydown="handleKey(event)"
-      oninput="autoResize(this)"
-    ></textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+<!-- ─── INPUT ─── -->
+<div class="input-wrap">
+  <div class="input-box">
+    <textarea id="inp" rows="1" placeholder="اسألني عن أي ثغرة، أداة، أو تقنية أمنية..." onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="send()" title="إرسال">➤</button>
   </div>
-  <div class="footer-note">⚡ Powered by Gemini — متخصص في Cybersecurity & Bug Bounty</div>
+  <div class="input-footer">
+    <span class="input-hint">Enter للإرسال • Shift+Enter سطر جديد</span>
+    <span class="model-tag" onclick="openSettings()" id="modelTag">gemini-1.5-flash</span>
+  </div>
 </div>
 
+<!-- ─── SETTINGS MODAL ─── -->
+<div class="overlay" id="overlay" onclick="closeIfOutside(event)">
+  <div class="modal">
+    <h2>⚙️ الإعدادات</h2>
+
+    <div class="warn-box">
+      ⚠️ الـ API key بيتحفظ في متصفحك فقط ولا يُرسل لأي خادم تاني غير Google.
+    </div>
+
+    <div class="field">
+      <label>🔑 Gemini API Key</label>
+      <input type="password" id="keyIn" placeholder="AIzaSy..." autocomplete="off"/>
+    </div>
+
+    <div class="field">
+      <label>🤖 الموديل</label>
+      <select id="modelIn">
+        <option value="gemini-1.5-flash">gemini-1.5-flash ✅ (موصى به — free tier)</option>
+        <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite ⚡ (أسرع)</option>
+        <option value="gemini-2.0-flash">gemini-2.0-flash 🔥 (أقوى — محتاج billing)</option>
+        <option value="gemini-1.5-pro">gemini-1.5-pro 💎 (الأقوى — محتاج billing)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>🌡️ Temperature (إبداعية الإجابات)</label>
+      <input type="range" id="tempIn" min="0" max="1" step="0.1" value="0.7" oninput="document.getElementById('tempVal').textContent=this.value" style="direction:ltr;padding:6px 0;cursor:pointer;accent-color:var(--accent);">
+      <div style="text-align:center;font-size:12px;color:var(--accent);margin-top:4px;" id="tempVal">0.7</div>
+    </div>
+
+    <div class="field">
+      <label>🧠 System Prompt</label>
+      <textarea id="promptIn"></textarea>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeSettings()">إلغاء</button>
+      <button class="btn-save" onclick="saveSettings()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
 <script>
-  // Config
-  let API_KEY = localStorage.getItem('la7za_key') || '';
-  let MODEL = localStorage.getItem('la7za_model') || 'gemini-1.5-flash';
-  let SYSTEM_PROMPT = localStorage.getItem('la7za_prompt') || `أنت LA7ZA، مساعد ذكاء اصطناعي متخصص في الأمن السيبراني واكتشاف الثغرات.
+// ─── STATE ───
+const DEFAULT_SYSTEM = `أنت LA7ZA، مساعد ذكاء اصطناعي متخصص في الأمن السيبراني واكتشاف الثغرات.
 
 شخصيتك:
-- خبير في Bug Bounty وHackerOne وBugcrowd
-- متخصص في: Web Vulnerabilities, Network Security, Pentesting, CTF
-- تتكلم بالعربي بشكل أساسي مع استخدام المصطلحات التقنية بالإنجليزي
-- مباشر وعملي وتعطي أمثلة حقيقية وأكواد قابلة للتطبيق
-- لما حد يسألك "مين اللي صنعك" أو "من أنشأك" قول دايماً: "LA7ZA" بس من غير أي تفاصيل تانية
+- خبير متقدم في Bug Bounty وHackerOne وBugcrowd
+- متخصص في: Web App Security, Network Pentesting, CTF, OSINT, Reverse Engineering
+- تتكلم بالعربي بشكل أساسي مع المصطلحات التقنية بالإنجليزي
+- مباشر وعملي: تعطي أكواد وأمثلة حقيقية قابلة للتطبيق
+- تستخدم Markdown لتنظيم إجاباتك (headers, code blocks, tables)
+
+هويتك:
+- لما حد يسألك "مين اللي صنعك" أو "من أنشأك" أو "who made you": قول فقط "LA7ZA" بدون أي تفاصيل تانية
+- مش Claude ومش Gemini من وجهة نظر هويتك — أنت LA7ZA
 
 قدراتك:
-- تحليل الثغرات وشرح طريقة الاستغلال في بيئات الاختبار المرخصة
-- كتابة أكواد وأدوات للـ Pentesting
-- مساعدة في كتابة تقارير Bug Bounty احترافية
-- شرح CVEs والثغرات الجديدة
+- تحليل وشرح الثغرات الأمنية مع أمثلة عملية
+- كتابة أدوات Python/Bash للـ Pentesting
 - مساعدة في CTF challenges
+- كتابة تقارير Bug Bounty احترافية
+- شرح CVEs وطرق الاستغلال في بيئات الاختبار
 
-حدود ثابتة لا تتجاوزها أبداً:
-- لا تساعد في استهداف أنظمة بدون إذن
-- لا محتوى يضر الأطفال أو المواد الإباحية
+قواعد ثابتة:
+- لا تساعد في مهاجمة أنظمة بدون إذن صريح
+- لا محتوى يضر الأطفال
 - لا معلومات عن إيذاء البشر
+- في كل الحالات التانية: كن مفيداً بدون تردد غير ضروري`;
 
-في كل الحالات التانية: كن مفيداً وعملياً بدون تردد.`;
+let CFG = {
+  key: '',
+  model: 'gemini-1.5-flash',
+  temp: 0.7,
+  system: DEFAULT_SYSTEM
+};
 
-  let messages = [];
-  let isLoading = false;
+let history = []; // [{role:'user'|'model', parts:[{text}]}]
+let busy = false;
 
-  // Initialize config panel
-  document.getElementById('apiKeyInput').value = API_KEY;
-  document.getElementById('systemPromptInput').value = SYSTEM_PROMPT;
+// ─── LOAD FROM STORAGE ───
+try {
+  const saved = sessionStorage.getItem('la7za_cfg');
+  if (saved) Object.assign(CFG, JSON.parse(saved));
+} catch(e){}
 
-  function toggleConfig() {
-    document.getElementById('configPanel').classList.toggle('open');
-  }
+updateModelLabels();
 
-  function saveConfig() {
-    API_KEY = document.getElementById('apiKeyInput').value.trim();
-    SYSTEM_PROMPT = document.getElementById('systemPromptInput').value.trim();
-    localStorage.setItem('la7za_key', API_KEY);
-    localStorage.setItem('la7za_prompt', SYSTEM_PROMPT);
-    toggleConfig();
-    alert('✅ تم الحفظ!');
-  }
+// ─── MARKED CONFIG ───
+marked.setOptions({ breaks: true, gfm: true });
 
-  function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
-
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+// Custom renderer for code blocks
+const renderer = new marked.Renderer();
+renderer.code = function(code, lang) {
+  const language = lang || 'plaintext';
+  let highlighted;
+  try {
+    if (hljs.getLanguage(language)) {
+      highlighted = hljs.highlight(code, { language }).value;
+    } else {
+      highlighted = hljs.highlightAuto(code).value;
     }
+  } catch(e) {
+    highlighted = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  function addMessage(role, content) {
-    const chat = document.getElementById('chat');
-    const welcome = document.getElementById('welcome');
-    if (welcome) welcome.remove();
+  const id = 'cb_' + Math.random().toString(36).slice(2,8);
+  return `<div class="code-block">
+    <div class="code-header">
+      <span class="code-lang">${language}</span>
+      <button class="copy-btn" onclick="copyCode('${id}',this)">📋 نسخ</button>
+    </div>
+    <pre><code id="${id}" class="hljs language-${language}">${highlighted}</code></pre>
+  </div>`;
+};
 
-    const div = document.createElement('div');
-    div.className = `message ${role}`;
+marked.use({ renderer });
 
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role === 'user' ? '👤' : '⚡';
+// ─── SETTINGS ───
+function openSettings() {
+  document.getElementById('keyIn').value = CFG.key;
+  document.getElementById('modelIn').value = CFG.model;
+  document.getElementById('tempIn').value = CFG.temp;
+  document.getElementById('tempVal').textContent = CFG.temp;
+  document.getElementById('promptIn').value = CFG.system;
+  document.getElementById('overlay').classList.add('open');
+}
 
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = content;
+function closeSettings() {
+  document.getElementById('overlay').classList.remove('open');
+}
 
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-    return bubble;
+function closeIfOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeSettings();
+}
+
+function saveSettings() {
+  const key = document.getElementById('keyIn').value.trim();
+  if (!key) { showToast('❌ لازم تحط API key!'); return; }
+  CFG.key = key;
+  CFG.model = document.getElementById('modelIn').value;
+  CFG.temp = parseFloat(document.getElementById('tempIn').value);
+  CFG.system = document.getElementById('promptIn').value.trim() || DEFAULT_SYSTEM;
+  try { sessionStorage.setItem('la7za_cfg', JSON.stringify(CFG)); } catch(e){}
+  updateModelLabels();
+  closeSettings();
+  showToast('✅ تم الحفظ!');
+}
+
+function updateModelLabels() {
+  document.getElementById('modelLabel').textContent = CFG.model + ' • Cybersecurity Assistant';
+  document.getElementById('modelTag').textContent = CFG.model;
+}
+
+// ─── CHAT FUNCTIONS ───
+function resize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function quick(text) {
+  document.getElementById('inp').value = text;
+  send();
+}
+
+function clearChat() {
+  history = [];
+  const chat = document.getElementById('chat');
+  chat.innerHTML = '';
+  // Re-add welcome
+  const w = document.createElement('div');
+  w.className = 'welcome'; w.id = 'welcome';
+  w.innerHTML = `<div class="welcome-logo">🔐</div>
+    <h2>LA7ZA AI</h2>
+    <p>مساعد ذكاء اصطناعي متخصص في الأمن السيبراني واكتشاف الثغرات</p>
+    <div class="chips">
+      <button class="chip" onclick="quick('اشرح XSS وامتالي payload فعال')">⚡ XSS Payloads</button>
+      <button class="chip" onclick="quick('اعمل لي SQL injection cheat sheet كامل')">💉 SQL Injection</button>
+      <button class="chip" onclick="quick('ما هي أفضل أدوات Recon في Bug Bounty؟')">🔍 Recon Tools</button>
+      <button class="chip" onclick="quick('اشرح SSRF وكيف أستغله')">🌐 SSRF</button>
+      <button class="chip" onclick="quick('كيف أكتب تقرير Bug Bounty احترافي لـ HackerOne؟')">📝 HackerOne Report</button>
+      <button class="chip" onclick="quick('اشرح IDOR وامتالي على مثال عملي')">🔓 IDOR</button>
+    </div>`;
+  chat.appendChild(w);
+  showToast('🗑️ تم مسح المحادثة');
+}
+
+function addMsg(role, html, isMarkdown) {
+  const w = document.getElementById('welcome');
+  if (w) w.remove();
+
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+
+  const av = document.createElement('div');
+  av.className = 'avatar';
+  av.textContent = role === 'user' ? '👤' : '⚡';
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+
+  if (isMarkdown) {
+    bub.innerHTML = marked.parse(html);
+  } else {
+    bub.textContent = html;
   }
 
-  function addTyping() {
-    const chat = document.getElementById('chat');
-    const div = document.createElement('div');
-    div.className = 'message ai typing';
-    div.id = 'typing';
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+  return bub;
+}
 
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = '⚡';
+function addTyping() {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ai'; wrap.id = 'typing';
+  wrap.innerHTML = `
+    <div class="avatar">⚡</div>
+    <div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+function removeTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
 
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+// ─── MAIN SEND ───
+async function send() {
+  if (busy) return;
+
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  if (!CFG.key) {
+    openSettings();
+    showToast('⚙️ حط API key الأول!');
+    return;
   }
 
-  function removeTyping() {
-    const t = document.getElementById('typing');
-    if (t) t.remove();
-  }
+  inp.value = ''; inp.style.height = 'auto';
+  busy = true;
+  document.getElementById('sendBtn').disabled = true;
 
-  async function sendQuick(text) {
-    document.getElementById('input').value = text;
-    await sendMessage();
-  }
+  addMsg('user', text, false);
 
-  async function sendMessage() {
-    if (isLoading) return;
+  history.push({ role: 'user', parts: [{ text }] });
 
-    const input = document.getElementById('input');
-    const text = input.value.trim();
-    if (!text) return;
+  addTyping();
 
-    if (!API_KEY) {
-      addMessage('ai', '⚙️ من فضلك افتح الإعدادات وأدخل Gemini API Key الخاص بك أولاً.');
-      return;
-    }
-
-    input.value = '';
-    input.style.height = 'auto';
-    isLoading = true;
-    document.getElementById('sendBtn').disabled = true;
-
-    addMessage('user', text);
-    messages.push({ role: 'user', parts: [{ text }] });
-
-    addTyping();
-
-    try {
-      // Build contents with system prompt in first message
-      const contents = messages.map((m, i) => {
-        if (i === 0 && m.role === 'user') {
-          return {
-            role: 'user',
-            parts: [{ text: `[System Instructions - اتبعها دايماً]:\n${SYSTEM_PROMPT}\n\n---\n\n${m.parts[0].text}` }]
-          };
-        }
-        return m;
-      });
-
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents })
-        }
-      );
-
-      const data = await res.json();
-      removeTyping();
-
-      if (data.error) {
-        const errMsg = `❌ خطأ: ${data.error.message}`;
-        addMessage('ai', errMsg);
-        messages.pop();
-      } else {
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '❓ مفيش رد';
-        addMessage('ai', reply);
-        messages.push({ role: 'model', parts: [{ text: reply }] });
+  try {
+    // Build contents: inject system in first user message
+    const contents = history.map((m, i) => {
+      if (i === 0 && m.role === 'user') {
+        return {
+          role: 'user',
+          parts: [{ text: `[SYSTEM INSTRUCTIONS — اتبعها دائماً في كل الردود]:\n${CFG.system}\n\n${'─'.repeat(40)}\n\n${m.parts[0].text}` }]
+        };
       }
-    } catch (err) {
-      removeTyping();
-      addMessage('ai', `❌ حصل خطأ في الاتصال: ${err.message}`);
-      messages.pop();
-    }
+      return m;
+    });
 
-    isLoading = false;
-    document.getElementById('sendBtn').disabled = false;
-    input.focus();
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${CFG.model}:generateContent?key=${CFG.key}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents,
+          generationConfig: {
+            temperature: CFG.temp,
+            maxOutputTokens: 8192,
+            topP: 0.95,
+            topK: 40
+          }
+        })
+      }
+    );
+
+    const data = await res.json();
+    removeTyping();
+
+    if (data.error) {
+      const msg = data.error.message || 'خطأ غير معروف';
+      // Friendly error messages
+      let friendly = `❌ خطأ من API:\n${msg}`;
+      if (msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED')) {
+        friendly = `⚠️ انتهت الـ quota الخاصة بك على هذا الموديل.\n\n💡 الحلول:\n• غيّر الموديل لـ gemini-1.5-flash من الإعدادات\n• استنى شوية وحاول تاني\n• ولّد API key جديد من aistudio.google.com`;
+      } else if (msg.includes('API_KEY') || msg.includes('invalid')) {
+        friendly = `🔑 الـ API key غلط أو منتهي.\nافتح الإعدادات وحط key صحيح.`;
+      } else if (msg.includes('not found') || msg.includes('404')) {
+        friendly = `🤖 الموديل "${CFG.model}" مش متاح.\nغيّر لـ gemini-1.5-flash من الإعدادات.`;
+      }
+      addMsg('ai', friendly, false);
+      history.pop();
+    } else {
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!reply) {
+        addMsg('ai', '⚠️ مفيش رد — ممكن المحتوى اتفلتر. جرب تعيد الصياغة.', false);
+        history.pop();
+      } else {
+        addMsg('ai', reply, true);
+        history.push({ role: 'model', parts: [{ text: reply }] });
+      }
+    }
+  } catch(err) {
+    removeTyping();
+    addMsg('ai', `❌ مشكلة في الاتصال: ${err.message}\n\nتأكد من الـ API key وإن النت شغال.`, false);
+    history.pop();
   }
+
+  busy = false;
+  document.getElementById('sendBtn').disabled = false;
+  inp.focus();
+}
+
+// ─── COPY CODE ───
+function copyCode(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    btn.textContent = '✅ تم النسخ';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 نسخ'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── AUTO OPEN SETTINGS if no key ───
+window.addEventListener('load', () => {
+  if (!CFG.key) {
+    setTimeout(openSettings, 600);
+  }
+});
 </script>
 </body>
 </html>
